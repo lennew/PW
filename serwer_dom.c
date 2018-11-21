@@ -64,15 +64,15 @@ int main() {
         //  ***KONIEC CZYTANIA***
         
         getStr(buf, commands, &clientsFifo);
-        
         //  ***PISZ DO FIFO KLIENTA***
-        if ((cli_fd = open(clientsFifo, O_WRONLY)) == -1) {
-            perror("opening clients fifo by server");
-            exit(1);
-        }
-        dup2(cli_fd, 1);
         
         if (fork() == 0) {
+            if ((cli_fd = open(clientsFifo, O_WRONLY)) == -1) {
+                perror("opening clients fifo by server");
+                exit(1);
+            
+            }
+            dup2(cli_fd, 1);
             if (execvp(commands[0], commands) == -1);
             {
                 printf("bad comm");
@@ -82,13 +82,11 @@ int main() {
             }
             exit(0);
         }
-        
         if (wait(NULL) == -1) {
             perror("wait on child");
             exit(1);
         }
         
-        close(cli_fd);
         //  ***KONIEC PISANIA***
     }
     return 0;
